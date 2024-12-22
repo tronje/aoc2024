@@ -1,7 +1,9 @@
+mod day01;
 mod puzzle;
 
 pub type Error = Box<dyn std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;
+pub use puzzle::Puzzle;
 
 fn main() -> Result<()> {
     let day = std::env::args()
@@ -40,7 +42,9 @@ fn main() -> Result<()> {
 }
 
 fn day01() -> Result<()> {
-    todo!()
+    let mut a = day01::A;
+    println!("part A: {}", a.solution()?);
+    Ok(())
 }
 
 fn day02() -> Result<()> {
