@@ -117,6 +117,10 @@ fn day06() -> Result<()> {
 fn day07() -> Result<()> {
     let mut a = day07::A;
     println!("part A: {}", a.solution()?);
+
+    let mut b = day07::B;
+    println!("part B: {}", b.solution()?);
+
     Ok(())
 }
 
