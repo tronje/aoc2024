@@ -5,6 +5,13 @@ pub type Error = Box<dyn std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;
 pub use puzzle::Puzzle;
 
+pub mod prelude {
+    pub use super::Result;
+    pub use crate::puzzle::Puzzle;
+    pub use std::fs::File;
+    pub use std::io::BufRead;
+}
+
 fn main() -> Result<()> {
     let day = std::env::args()
         .nth(1)

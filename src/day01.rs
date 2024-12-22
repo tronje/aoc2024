@@ -1,5 +1,5 @@
-use crate::{Puzzle, Result};
-use std::{collections::HashMap, io::BufRead};
+use crate::prelude::*;
+use std::collections::HashMap;
 
 pub struct Input {
     left: Vec<i32>,
