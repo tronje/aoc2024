@@ -34,7 +34,7 @@ impl Position {
     }
 }
 
-#[derive(Default, Clone, Copy, PartialEq, Eq)]
+#[derive(Default, Clone, Copy, PartialEq, Eq, Hash)]
 enum Orientation {
     #[default]
     Up,
@@ -54,7 +54,7 @@ impl Orientation {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy, PartialEq, Eq, Hash)]
 struct Guard {
     position: Position,
     orientation: Orientation,
@@ -70,6 +70,7 @@ impl Guard {
     }
 }
 
+#[derive(Clone)]
 pub struct Map {
     obstacles: HashSet<Position>,
     guard: Guard,
@@ -80,7 +81,7 @@ pub struct Map {
 
 impl Map {
     fn guard_update(&mut self) {
-        if self.obstacles.contains(&self.guard.step()) {
+        while self.obstacles.contains(&self.guard.step()) {
             self.guard.turn();
         }
 
@@ -186,6 +187,83 @@ impl Puzzle for A {
     }
 }
 
+pub struct B;
+
+impl B {
+    fn test_obstacle(&self, map: &Map, obstacle: Position) -> bool {
+        let mut test_map = map.clone();
+        test_map.obstacles.insert(obstacle);
+
+        let mut guard_positions = HashSet::new();
+        guard_positions.insert(test_map.guard);
+
+        while !test_map.finished() {
+            test_map.guard_update();
+
+            if !guard_positions.insert(test_map.guard) {
+                // if insert returns false, the value was already contained; this means the
+                // guard visited a (position, orientation) combination a second time, so she's
+                // in a loop
+                return true;
+            }
+        }
+
+        false
+    }
+}
+
+impl Puzzle for B {
+    type Input = Map;
+    type Output = u32;
+
+    fn example_input() -> Self::Input {
+        A::example_input()
+    }
+
+    fn example_output() -> Self::Output {
+        6
+    }
+
+    fn input_file() -> &'static str {
+        "inputs/day06/input"
+    }
+
+    fn parse_input<B>(reader: B) -> Result<Self::Input>
+    where
+        B: BufRead,
+    {
+        A::parse_input(reader)
+    }
+
+    fn solve(&mut self, map: Self::Input) -> Result<Self::Output> {
+        let mut count = 0;
+        let mut possible_obstacles = HashSet::new();
+
+        let mut test_map = map.clone();
+
+        loop {
+            test_map.guard_update();
+
+            if test_map.finished() {
+                break;
+            }
+
+            // can't place an obstacle in guard's starting position
+            if test_map.guard.position != map.guard.position {
+                possible_obstacles.insert(test_map.guard.position);
+            }
+        }
+
+        for obs in possible_obstacles {
+            if self.test_obstacle(&map, obs) {
+                count += 1;
+            }
+        }
+
+        Ok(count)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -194,5 +272,11 @@ mod tests {
     fn a() -> Result<()> {
         let mut a = A;
         a.test_example()
+    }
+
+    #[test]
+    fn b() -> Result<()> {
+        let mut b = B;
+        b.test_example()
     }
 }
