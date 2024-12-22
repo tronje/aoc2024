@@ -61,7 +61,7 @@ impl Input {
             && self.lines[y + 3][x + 3] == 'S'
     }
 
-    fn count(&self) -> u32 {
+    fn count_xmas(&self) -> u32 {
         let mut count = 0;
 
         for (y, line) in self.lines.iter().enumerate() {
@@ -99,6 +99,52 @@ impl Input {
                         count += 1;
                     }
                 }
+            }
+        }
+
+        count
+    }
+
+    fn count_x_mas(&self) -> u32 {
+        let mut count = 0;
+
+        for (y, line) in self.lines.iter().enumerate() {
+            for (x, &top_left) in line.iter().enumerate() {
+                let top_right = match line.get(x + 2) {
+                    Some(&top_right) => top_right,
+                    None => continue,
+                };
+
+                let bottom_left = match self.lines.get(y + 2).and_then(|line| line.get(x)) {
+                    Some(&bottom_left) => bottom_left,
+                    None => continue,
+                };
+
+                let bottom_right = match self.lines.get(y + 2).and_then(|line| line.get(x + 2)) {
+                    Some(&bottom_right) => bottom_right,
+                    None => continue,
+                };
+
+                match self.lines.get(y + 1).and_then(|line| line.get(x + 1)) {
+                    Some(&center) => {
+                        if center != 'A' {
+                            continue;
+                        }
+                    }
+                    None => continue,
+                }
+
+                match (top_left, bottom_right) {
+                    ('M', 'S') | ('S', 'M') => {}
+                    _ => continue,
+                }
+
+                match (top_right, bottom_left) {
+                    ('M', 'S') | ('S', 'M') => {}
+                    _ => continue,
+                }
+
+                count += 1;
             }
         }
 
@@ -151,7 +197,38 @@ impl Puzzle for A {
     }
 
     fn solve(&mut self, input: Self::Input) -> Result<Self::Output> {
-        Ok(input.count())
+        Ok(input.count_xmas())
+    }
+}
+
+pub struct B;
+
+impl Puzzle for B {
+    type Input = Input;
+    type Output = u32;
+
+    fn example_input() -> Self::Input {
+        A::example_input()
+    }
+
+    fn example_output() -> Self::Output {
+        9
+    }
+
+    fn input_file() -> &'static str {
+        "inputs/day04/input"
+    }
+
+    fn parse_input<B>(&mut self, reader: B) -> Result<Self::Input>
+    where
+        B: BufRead,
+    {
+        let mut a = A;
+        a.parse_input(reader)
+    }
+
+    fn solve(&mut self, input: Self::Input) -> Result<Self::Output> {
+        Ok(input.count_x_mas())
     }
 }
 
@@ -163,5 +240,11 @@ mod tests {
     fn a() -> Result<()> {
         let mut a = A;
         a.test_example()
+    }
+
+    #[test]
+    fn b() -> Result<()> {
+        let mut b = B;
+        b.test_example()
     }
 }
