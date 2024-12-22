@@ -3,6 +3,7 @@ mod day02;
 mod day03;
 mod day04;
 mod day05;
+mod day06;
 mod puzzle;
 
 pub type Error = Box<dyn std::error::Error>;
@@ -103,7 +104,9 @@ fn day05() -> Result<()> {
 }
 
 fn day06() -> Result<()> {
-    todo!()
+    let mut a = day06::A;
+    println!("part A: {}", a.solution()?);
+    Ok(())
 }
 
 fn day07() -> Result<()> {
