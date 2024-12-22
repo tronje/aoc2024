@@ -48,6 +48,59 @@ impl Puzzle for A {
     }
 }
 
+pub struct B;
+
+impl Puzzle for B {
+    type Input = String;
+    type Output = u32;
+
+    fn example_input() -> Self::Input {
+        "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))".into()
+    }
+
+    fn example_output() -> Self::Output {
+        48
+    }
+
+    fn input_file() -> &'static str {
+        "inputs/day03/input"
+    }
+
+    fn parse_input<B>(&mut self, reader: B) -> Result<Self::Input>
+    where
+        B: BufRead,
+    {
+        let mut a = A;
+        a.parse_input(reader)
+    }
+
+    fn solve(&mut self, input: Self::Input) -> Result<Self::Output> {
+        let mut out = 0;
+        let mut split = input.split("don't()");
+
+        // gather all until first "don't()" instruction
+        if let Some(substring) = split.next() {
+            let parser = Parser::new(substring.chars());
+
+            for mul in parser {
+                out += mul.compute();
+            }
+        }
+
+        for substring in split {
+            for subsubstring in substring.split("do()").skip(1) {
+                let parser = Parser::new(subsubstring.chars());
+
+                for mul in parser {
+                    out += mul.compute();
+                }
+            }
+        }
+
+        Ok(out)
+    }
+}
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Token {
     M,
@@ -188,5 +241,11 @@ mod tests {
     fn a() -> Result<()> {
         let mut a = A;
         a.test_example()
+    }
+
+    #[test]
+    fn b() -> Result<()> {
+        let mut b = B;
+        b.test_example()
     }
 }
