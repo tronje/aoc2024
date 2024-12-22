@@ -167,7 +167,7 @@ impl Puzzle for A {
         "inputs/day05/input"
     }
 
-    fn parse_input<B>(&mut self, reader: B) -> Result<Self::Input>
+    fn parse_input<B>(reader: B) -> Result<Self::Input>
     where
         B: BufRead,
     {
@@ -217,12 +217,11 @@ impl Puzzle for B {
         "inputs/day05/input"
     }
 
-    fn parse_input<B>(&mut self, reader: B) -> Result<Self::Input>
+    fn parse_input<B>(reader: B) -> Result<Self::Input>
     where
         B: BufRead,
     {
-        let mut a = A;
-        a.parse_input(reader)
+        A::parse_input(reader)
     }
 
     fn solve(&mut self, mut input: Self::Input) -> Result<Self::Output> {

@@ -29,7 +29,7 @@ pub trait Puzzle {
         Ok(BufReader::new(f))
     }
 
-    fn parse_input<B>(&mut self, reader: B) -> Result<Self::Input>
+    fn parse_input<B>(reader: B) -> Result<Self::Input>
     where
         B: BufRead;
 
@@ -37,7 +37,7 @@ pub trait Puzzle {
 
     fn solution(&mut self) -> Result<Self::Output> {
         let reader = Self::load_input()?;
-        let input = self.parse_input(reader)?;
+        let input = Self::parse_input(reader)?;
         self.solve(input)
     }
 }

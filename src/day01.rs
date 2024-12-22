@@ -27,7 +27,7 @@ impl Puzzle for A {
         "inputs/day01/input"
     }
 
-    fn parse_input<B: BufRead>(&mut self, reader: B) -> Result<Self::Input> {
+    fn parse_input<B: BufRead>(reader: B) -> Result<Self::Input> {
         let mut left = Vec::new();
         let mut right = Vec::new();
 
@@ -81,9 +81,8 @@ impl Puzzle for B {
         "inputs/day01/input"
     }
 
-    fn parse_input<B: BufRead>(&mut self, reader: B) -> Result<Self::Input> {
-        let mut a = A;
-        a.parse_input(reader)
+    fn parse_input<B: BufRead>(reader: B) -> Result<Self::Input> {
+        A::parse_input(reader)
     }
 
     fn solve(&mut self, input: Self::Input) -> Result<Self::Output> {
