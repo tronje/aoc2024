@@ -55,6 +55,29 @@ impl Update {
         true
     }
 
+    fn fix<'a, R>(&mut self, rules: R)
+    where
+        R: Iterator<Item = &'a Rule>,
+    {
+        for rule in rules {
+            if !self.follows(rule) {
+                let earlier = self
+                    .pages
+                    .iter()
+                    .position(|&item| item == rule.earlier)
+                    .unwrap();
+
+                let later = self
+                    .pages
+                    .iter()
+                    .position(|&item| item == rule.later)
+                    .unwrap();
+
+                self.pages.swap(earlier, later);
+            }
+        }
+    }
+
     fn middle_page(&self) -> u32 {
         self.pages[self.pages.len() / 2]
     }
@@ -176,6 +199,51 @@ impl Puzzle for A {
     }
 }
 
+pub struct B;
+
+impl Puzzle for B {
+    type Input = Input;
+    type Output = u32;
+
+    fn example_input() -> Self::Input {
+        A::example_input()
+    }
+
+    fn example_output() -> Self::Output {
+        123
+    }
+
+    fn input_file() -> &'static str {
+        "inputs/day05/input"
+    }
+
+    fn parse_input<B>(&mut self, reader: B) -> Result<Self::Input>
+    where
+        B: BufRead,
+    {
+        let mut a = A;
+        a.parse_input(reader)
+    }
+
+    fn solve(&mut self, mut input: Self::Input) -> Result<Self::Output> {
+        let mut sum = 0;
+        for update in input
+            .updates
+            .iter_mut()
+            .filter(|update| !update.follows_all(input.rules.iter()))
+        {
+            // this feels like it shouldn't work, but it does...
+            while !update.follows_all(input.rules.iter()) {
+                update.fix(input.rules.iter());
+            }
+
+            sum += update.middle_page();
+        }
+
+        Ok(sum)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -184,5 +252,11 @@ mod tests {
     fn a() -> Result<()> {
         let mut a = A;
         a.test_example()
+    }
+
+    #[test]
+    fn b() -> Result<()> {
+        let mut b = B;
+        b.test_example()
     }
 }
